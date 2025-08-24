@@ -102,6 +102,63 @@ footer {
     }
 }
 
+/* 海报图片展示样式 */
+.poster-container {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.poster-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.poster-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* 海报卡片样式 */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* 响应式海报布局 */
+@media (max-width: 768px) {
+    .poster-container {
+        margin: 0.5rem 0;
+    }
+    
+    .poster-image {
+        border-radius: 8px;
+    }
+    
+    .card-title {
+        font-size: 0.9rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .poster-image {
+        max-height: 300px;
+        object-fit: cover;
+    }
+}
+
 /* 动画效果 */
 @keyframes fadeIn {
     from {
@@ -139,3 +196,4 @@ footer {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
