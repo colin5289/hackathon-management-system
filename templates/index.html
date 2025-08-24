@@ -25,7 +25,8 @@
                     <div class="poster-container">
                         <img src="{{ url_for('static', filename='images/poster_1.jpg') }}" 
                              alt="AI Coding 创新大赛主海报" 
-                             class="img-fluid poster-image rounded shadow">
+                             class="img-fluid poster-image rounded shadow"
+                             onclick="openPosterModal('{{ url_for('static', filename='images/poster_1.jpg') }}', '主赛事宣传海报')">
                     </div>
                 </div>
             </div>
@@ -38,7 +39,8 @@
                     <div class="poster-container">
                         <img src="{{ url_for('static', filename='images/poster_2.jpg') }}" 
                              alt="AI Coding 加赛规则" 
-                             class="img-fluid poster-image rounded shadow">
+                             class="img-fluid poster-image rounded shadow"
+                             onclick="openPosterModal('{{ url_for('static', filename='images/poster_2.jpg') }}', '加赛规则说明')">
                     </div>
                 </div>
             </div>
@@ -51,7 +53,8 @@
                     <div class="poster-container">
                         <img src="{{ url_for('static', filename='images/poster_3.jpg') }}" 
                              alt="AI Coding 赛程安排" 
-                             class="img-fluid poster-image rounded shadow">
+                             class="img-fluid poster-image rounded shadow"
+                             onclick="openPosterModal('{{ url_for('static', filename='images/poster_3.jpg') }}', '赛程安排')">
                     </div>
                 </div>
             </div>
@@ -64,7 +67,8 @@
                     <div class="poster-container">
                         <img src="{{ url_for('static', filename='images/poster_4.jpg') }}" 
                              alt="AI Coding 报名通道" 
-                             class="img-fluid poster-image rounded shadow">
+                             class="img-fluid poster-image rounded shadow"
+                             onclick="openPosterModal('{{ url_for('static', filename='images/poster_4.jpg') }}', '报名通道')">
                     </div>
                 </div>
             </div>
@@ -77,7 +81,8 @@
                     <div class="poster-container">
                         <img src="{{ url_for('static', filename='images/poster_5.jpg') }}" 
                              alt="AI Coding 加赛说明" 
-                             class="img-fluid poster-image rounded shadow">
+                             class="img-fluid poster-image rounded shadow"
+                             onclick="openPosterModal('{{ url_for('static', filename='images/poster_5.jpg') }}', '加赛说明')">
                     </div>
                 </div>
             </div>
@@ -90,12 +95,141 @@
                     <div class="poster-container">
                         <img src="{{ url_for('static', filename='images/poster_6.jpg') }}" 
                              alt="AI Coding 话题互动" 
-                             class="img-fluid poster-image rounded shadow">
+                             class="img-fluid poster-image rounded shadow"
+                             onclick="openPosterModal('{{ url_for('static', filename='images/poster_6.jpg') }}', '话题互动')">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 海报放大模态框 -->
+<div class="modal fade" id="posterModal" tabindex="-1" aria-labelledby="posterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="posterModalLabel">海报详情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-0 position-relative">
+                <!-- 左箭头 -->
+                <button type="button" class="btn btn-light poster-nav-btn poster-nav-prev" onclick="showPreviousPoster()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <!-- 右箭头 -->
+                <button type="button" class="btn btn-light poster-nav-btn poster-nav-next" onclick="showNextPoster()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <img id="modalPosterImage" src="" alt="海报图片" class="img-fluid w-100">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 海报数据数组
+const posterData = [
+    { src: '{{ url_for("static", filename="images/poster_1.jpg") }}', title: '主赛事宣传海报' },
+    { src: '{{ url_for("static", filename="images/poster_2.jpg") }}', title: '加赛规则说明' },
+    { src: '{{ url_for("static", filename="images/poster_3.jpg") }}', title: '赛程安排' },
+    { src: '{{ url_for("static", filename="images/poster_4.jpg") }}', title: '报名通道' },
+    { src: '{{ url_for("static", filename="images/poster_5.jpg") }}', title: '加赛说明' },
+    { src: '{{ url_for("static", filename="images/poster_6.jpg") }}', title: '话题互动' }
+];
+
+let currentPosterIndex = 0;
+
+// 打开海报模态框的函数
+function openPosterModal(imageSrc, title) {
+    // 找到当前图片的索引
+    currentPosterIndex = posterData.findIndex(poster => poster.src === imageSrc);
+    
+    // 设置模态框标题
+    document.getElementById('posterModalLabel').textContent = title;
+    
+    // 设置模态框中的图片
+    document.getElementById('modalPosterImage').src = imageSrc;
+    
+    // 显示模态框
+    const modal = new bootstrap.Modal(document.getElementById('posterModal'));
+    modal.show();
+    
+    // 更新箭头状态
+    updateNavigationArrows();
+}
+
+// 显示上一张海报
+function showPreviousPoster() {
+    if (currentPosterIndex > 0) {
+        currentPosterIndex--;
+    } else {
+        currentPosterIndex = posterData.length - 1; // 循环到最后一张
+    }
+    
+    const poster = posterData[currentPosterIndex];
+    document.getElementById('posterModalLabel').textContent = poster.title;
+    document.getElementById('modalPosterImage').src = poster.src;
+    
+    // 更新箭头状态
+    updateNavigationArrows();
+}
+
+// 显示下一张海报
+function showNextPoster() {
+    if (currentPosterIndex < posterData.length - 1) {
+        currentPosterIndex++;
+    } else {
+        currentPosterIndex = 0; // 循环到第一张
+    }
+    
+    const poster = posterData[currentPosterIndex];
+    document.getElementById('posterModalLabel').textContent = poster.title;
+    document.getElementById('modalPosterImage').src = poster.src;
+    
+    // 更新箭头状态
+    updateNavigationArrows();
+}
+
+// 更新导航箭头状态
+function updateNavigationArrows() {
+    const prevBtn = document.querySelector('.poster-nav-prev');
+    const nextBtn = document.querySelector('.poster-nav-next');
+    
+    // 更新箭头提示文本
+    const prevTitle = posterData[currentPosterIndex > 0 ? currentPosterIndex - 1 : posterData.length - 1].title;
+    const nextTitle = posterData[currentPosterIndex < posterData.length - 1 ? currentPosterIndex + 1 : 0].title;
+    
+    prevBtn.title = `上一张: ${prevTitle}`;
+    nextBtn.title = `下一张: ${nextTitle}`;
+}
+
+// 为所有海报图片添加点击提示
+document.addEventListener('DOMContentLoaded', function() {
+    const posterImages = document.querySelectorAll('.poster-image');
+    posterImages.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.title = '点击查看大图';
+    });
+    
+    // 添加键盘事件支持
+    document.addEventListener('keydown', function(e) {
+        if (document.getElementById('posterModal').classList.contains('show')) {
+            if (e.key === 'ArrowLeft') {
+                showPreviousPoster();
+            } else if (e.key === 'ArrowRight') {
+                showNextPoster();
+            } else if (e.key === 'Escape') {
+                bootstrap.Modal.getInstance(document.getElementById('posterModal')).hide();
+            }
+        }
+    });
+});
+</script>
 
 {% endblock %}
