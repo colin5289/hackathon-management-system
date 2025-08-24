@@ -21,14 +21,12 @@ wheels/
 *.egg
 MANIFEST
 
-# Flask
-instance/
-.webassets-cache
-
 # Virtual Environment
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
 # IDE
 .vscode/
@@ -46,27 +44,24 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Flask
+instance/
+.webassets-cache
 
 # Database
 *.db
 *.sqlite3
 
+# Logs
+*.log
+
 # Environment variables
 .env
 .env.local
-.env.production
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Temporary files
 *.tmp
 *.temp
-temp/
-tmp/
-
-# Generated files
-generate_logos.py
-init_teams_data.sql
-init_team_members_data.sql
-modify_team_status.sql
