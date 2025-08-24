@@ -268,19 +268,43 @@
 /* 响应式布局优化 */
 @media (min-width: 1400px) {
     .modal-xl {
-        max-width: 1320px;
+        max-width: 1320px !important;
     }
 }
 
 @media (min-width: 1200px) and (max-width: 1399px) {
     .modal-xl {
-        max-width: 1140px;
+        max-width: 1140px !important;
     }
 }
 
 @media (max-width: 1199px) and (min-width: 768px) {
     .modal-xl {
-        max-width: 900px;
+        max-width: 900px !important;
+    }
+}
+
+/* 强制确保成员卡片能正确显示3列 */
+.modal-xl .row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.modal-xl .col-md-4,
+.modal-xl .col-lg-4,
+.modal-xl .col-xl-4 {
+    padding-left: 15px;
+    padding-right: 15px;
+    float: left;
+    width: 33.333333%;
+}
+
+@media (max-width: 767px) {
+    .modal-xl .col-md-4,
+    .modal-xl .col-lg-4,
+    .modal-xl .col-xl-4 {
+        width: 100%;
+        float: none;
     }
 }
 
@@ -412,7 +436,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // 添加调试信息
         console.log('屏幕宽度:', window.innerWidth);
         console.log('成员数量:', teamData.members.length);
-        console.log('布局类名: col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4');
+        console.log('布局类名: col-12 col-md-4');
+        console.log('模态框宽度:', modal.offsetWidth);
         
         // 显示队伍基本信息
         let teamInfoHtml = `
@@ -445,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const positionText = member.position ? `<small class="text-muted d-block">${member.position}</small>` : '';
             
             membersHtml += `
-                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 mb-3">
+                <div class="col-12 col-md-4 mb-3">
                     <div class="card member-card h-100">
                         <div class="card-body text-center">
                             <div class="member-avatar mb-3">
