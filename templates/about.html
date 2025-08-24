@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}关于 - Flask 应用{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h2>关于这个 Flask 应用</h2>
+        <p class="lead">这是一个完整的 Flask Web 应用程序模板，包含了现代 Web 开发的最佳实践。</p>
+        
+        <h3>技术栈</h3>
+        <ul>
+            <li><strong>后端:</strong> Python Flask</li>
+            <li><strong>前端:</strong> Bootstrap 5</li>
+            <li><strong>模板引擎:</strong> Jinja2</li>
+            <li><strong>样式:</strong> CSS3</li>
+        </ul>
+
+        <h3>项目结构</h3>
+        <pre><code>hackathon/
+├── app.py              # 主应用文件
+├── templates/          # HTML 模板
+├── static/            # 静态文件
+│   ├── css/           # 样式文件
+│   └── js/            # JavaScript 文件
+└── requirements.txt   # Python 依赖
+</code></pre>
+
+        <h3>API 端点</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>方法</th>
+                        <th>端点</th>
+                        <th>描述</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/</td>
+                        <td>主页</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/about</td>
+                        <td>关于页面</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/hello</td>
+                        <td>Hello API</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/echo</td>
+                        <td>Echo API</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
