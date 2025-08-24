@@ -30,6 +30,45 @@ def teams():
     
     return render_template('teams.html', teams=teams)
 
+@app.route('/api/team/<int:team_id>/members')
+def get_team_members(team_id):
+    """获取指定队伍的所有成员信息"""
+    try:
+        # 获取队伍信息
+        team = Team.query.get_or_404(team_id)
+        
+        # 获取该队伍的所有成员
+        members = TeamMember.query.filter_by(team_id=team_id).order_by(TeamMember.is_leader.desc(), TeamMember.member_id).all()
+        
+        # 转换为字典格式
+        team_data = {
+            'team_id': team.team_id,
+            'team_name': team.team_name,
+            'team_logo': team.team_logo,
+            'team_slogan': team.team_slogan,
+            'team_description': team.team_description,
+            'member_count': len(members),
+            'members': []
+        }
+        
+        for member in members:
+            member_data = {
+                'member_id': member.member_id,
+                'member_name': member.member_name,
+                'member_photo': member.member_photo,
+                'member_email': member.member_email,
+                'member_phone': member.member_phone,
+                'is_leader': member.is_leader,
+                'position': member.position,
+                'joined_at': member.joined_at.strftime('%Y-%m-%d') if member.joined_at else None
+            }
+            team_data['members'].append(member_data)
+        
+        return jsonify({'success': True, 'data': team_data})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/about')
 def about():
     """关于页面"""

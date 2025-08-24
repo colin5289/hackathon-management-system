@@ -50,6 +50,13 @@
                                 <div class="fw-bold">{{ team.members|length }}人</div>
                             </div>
                         </div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm view-members-btn" 
+                                    data-team-id="{{ team.team_id }}" 
+                                    data-team-name="{{ team.team_name }}">
+                                <i class="fas fa-users me-1"></i>查看全部成员
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -103,6 +110,40 @@
         </div>
     </div>
     {% endif %}
+</div>
+
+<!-- 队伍成员详情模态框 -->
+<div class="modal fade" id="teamMembersModal" tabindex="-1" aria-labelledby="teamMembersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="teamMembersModalLabel">
+                    <i class="fas fa-users me-2"></i>
+                    <span id="modalTeamName"></span> - 成员详情
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4" id="modalTeamInfo">
+                    <!-- 队伍基本信息 -->
+                </div>
+                
+                <div class="row" id="modalMembersList">
+                    <!-- 成员列表将通过JavaScript动态加载 -->
+                </div>
+                
+                <div class="text-center" id="modalLoading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">加载中...</span>
+                    </div>
+                    <p class="mt-2">正在加载成员信息...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -193,6 +234,59 @@
     background-color: #f8f9fa !important;
 }
 
+/* 模态框样式 */
+.team-logo-modal {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #dee2e6;
+}
+
+.team-logo-placeholder-modal {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.member-card {
+    border: 1px solid #dee2e6;
+    transition: transform 0.2s ease-in-out;
+}
+
+.member-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.member-photo-modal {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dee2e6;
+}
+
+.member-photo-placeholder-modal {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.team-modal-info {
+    border: 1px solid #dee2e6;
+}
+
 @media (max-width: 768px) {
     .col-lg-6.col-xl-4 {
         margin-bottom: 1rem;
@@ -203,4 +297,170 @@
     }
 }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM加载完成，开始初始化...');
+    
+    // 获取模态框元素
+    const modal = document.getElementById('teamMembersModal');
+    const modalTeamName = document.getElementById('modalTeamName');
+    const modalTeamInfo = document.getElementById('modalTeamInfo');
+    const modalMembersList = document.getElementById('modalMembersList');
+    const modalLoading = document.getElementById('modalLoading');
+    
+    console.log('模态框元素:', {
+        modal: modal,
+        modalTeamName: modalTeamName,
+        modalTeamInfo: modalTeamInfo,
+        modalMembersList: modalMembersList,
+        modalLoading: modalLoading
+    });
+    
+    // 为所有"查看全部成员"按钮添加点击事件
+    const buttons = document.querySelectorAll('.view-members-btn');
+    console.log('找到按钮数量:', buttons.length);
+    
+    buttons.forEach((button, index) => {
+        console.log(`按钮 ${index + 1}:`, button);
+        button.addEventListener('click', function(e) {
+            console.log('按钮被点击!', e);
+            const teamId = this.getAttribute('data-team-id');
+            const teamName = this.getAttribute('data-team-name');
+            
+            console.log('队伍信息:', { teamId, teamName });
+            
+            // 显示模态框
+            try {
+                const modalInstance = new bootstrap.Modal(modal);
+                modalInstance.show();
+                console.log('模态框显示成功');
+            } catch (error) {
+                console.error('模态框显示失败:', error);
+            }
+            
+            // 设置模态框标题
+            modalTeamName.textContent = teamName;
+            
+            // 显示加载状态
+            modalLoading.style.display = 'block';
+            modalMembersList.style.display = 'none';
+            
+            // 加载队伍成员信息
+            loadTeamMembers(teamId);
+        });
+    });
+    
+    // 加载队伍成员信息的函数
+    function loadTeamMembers(teamId) {
+        fetch(`/api/team/${teamId}/members`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayTeamMembers(data.data);
+                } else {
+                    showError('加载失败：' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('网络错误，请稍后重试');
+            });
+    }
+    
+    // 显示队伍成员信息的函数
+    function displayTeamMembers(teamData) {
+        // 隐藏加载状态
+        modalLoading.style.display = 'none';
+        modalMembersList.style.display = 'block';
+        
+        // 显示队伍基本信息
+        let teamInfoHtml = `
+            <div class="team-modal-info p-3 bg-light rounded">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        ${teamData.team_logo ? 
+                            `<img src="${teamData.team_logo}" alt="${teamData.team_name} Logo" class="team-logo-modal">` :
+                            `<div class="team-logo-placeholder-modal"><i class="fas fa-users fa-2x"></i></div>`
+                        }
+                    </div>
+                    <div class="col-md-9">
+                        <h4 class="mb-2">${teamData.team_name}</h4>
+                        ${teamData.team_slogan ? `<p class="text-muted mb-2"><em>"${teamData.team_slogan}"</em></p>` : ''}
+                        ${teamData.team_description ? `<p class="mb-0">${teamData.team_description}</p>` : ''}
+                        <div class="mt-2">
+                            <span class="badge bg-primary me-2">队伍ID: #${teamData.team_id}</span>
+                            <span class="badge bg-success">成员: ${teamData.member_count}人</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        modalTeamInfo.innerHTML = teamInfoHtml;
+        
+        // 显示成员列表
+        let membersHtml = '';
+        teamData.members.forEach(member => {
+            const leaderBadge = member.is_leader ? '<span class="badge bg-warning text-dark ms-2">队长</span>' : '';
+            const positionText = member.position ? `<small class="text-muted d-block">${member.position}</small>` : '';
+            
+            membersHtml += `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card member-card h-100">
+                        <div class="card-body text-center">
+                            <div class="member-avatar mb-3">
+                                ${member.member_photo ? 
+                                    `<img src="${member.member_photo}" alt="${member.member_name}" class="member-photo-modal">` :
+                                    `<div class="member-photo-placeholder-modal"><i class="fas fa-user"></i></div>`
+                                }
+                            </div>
+                            <h6 class="card-title mb-1">
+                                ${member.member_name}
+                                ${leaderBadge}
+                            </h6>
+                            ${positionText}
+                            <div class="member-contact mt-2">
+                                <div class="text-muted small">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    <a href="mailto:${member.member_email}" class="text-decoration-none">${member.member_email}</a>
+                                </div>
+                                ${member.member_phone ? `
+                                    <div class="text-muted small">
+                                        <i class="fas fa-phone me-1"></i>
+                                        <a href="tel:${member.member_phone}" class="text-decoration-none">${member.member_phone}</a>
+                                    </div>
+                                ` : ''}
+                                ${member.joined_at ? `
+                                    <div class="text-muted small">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        加入时间: ${member.joined_at}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        modalMembersList.innerHTML = membersHtml;
+    }
+    
+    // 显示错误信息的函数
+    function showError(message) {
+        modalLoading.style.display = 'none';
+        modalMembersList.style.display = 'block';
+        modalMembersList.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger text-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${message}
+                </div>
+            </div>
+        `;
+    }
+});
+</script>
 {% endblock %}
